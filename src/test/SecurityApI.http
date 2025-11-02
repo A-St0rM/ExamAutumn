@@ -1,0 +1,30 @@
+### Register a new user
+POST http://localhost:7007/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "user2",
+  "password": "pass1234"
+}
+
+### Login and get JWT
+POST http://localhost:7007/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "user2",
+  "password": "pass1234"
+}
+
+> {% client.global.set("token", response.body.token); %}
+
+### Try to access protected route without token
+GET http://localhost:7007/api/v1/protected/user_demo
+
+### Access with valid token
+GET http://localhost:7007/api/v1/protected/user_demo
+Authorization: Bearer {{token}}
+
+### Access admin route with user token (should fail 403)
+GET http://localhost:7007/api/v1/protected/admin_demo
+Authorization: Bearer {{token}}
