@@ -11,6 +11,7 @@ import app.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.*;
 import dk.bugelhartmann.*;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Set;
@@ -29,6 +30,12 @@ public class SecurityController implements ISecurityController {
                 new SecurityDAO(HibernateConfig.getEntityManagerFactory())
         );
     }
+
+
+    public void healthCheck(Context ctx) {
+        ctx.status(200).json("{\"msg\": \"API is up and running\"}");
+    }
+
 
     public Handler login() {
         return ctx -> {
@@ -133,5 +140,6 @@ public class SecurityController implements ISecurityController {
         }
         return verifiedTokenUser;
     }
+
 
 }
