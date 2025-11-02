@@ -27,11 +27,11 @@ public class TokenService {
             if (System.getenv("DEPLOYED") != null) {
                 ISSUER = System.getenv("ISSUER");
                 TOKEN_EXPIRE_TIME = System.getenv("TOKEN_EXPIRE_TIME");
-                SECRET_KEY = System.getenv("SECRET_KEY");
+                SECRET_KEY = System.getenv("EXAM_SECRET_KEY");
             } else {
                 ISSUER = Utils.getPropertyValue("ISSUER", "config.properties");
                 TOKEN_EXPIRE_TIME = Utils.getPropertyValue("TOKEN_EXPIRE_TIME", "config.properties");
-                SECRET_KEY = Utils.getPropertyValue("SECRET_KEY", "config.properties");
+                SECRET_KEY = Utils.getPropertyValue("EXAM_SECRET_KEY", "config.properties");
             }
             return tokenSecurity.createToken(user, ISSUER, TOKEN_EXPIRE_TIME, SECRET_KEY);
         } catch (Exception e) {
@@ -42,7 +42,7 @@ public class TokenService {
 
     public UserDTO verifyToken(String token) {
         boolean IS_DEPLOYED = (System.getenv("DEPLOYED") != null);
-        String SECRET = IS_DEPLOYED ? System.getenv("SECRET_KEY") : Utils.getPropertyValue("SECRET_KEY", "config.properties");
+        String SECRET = IS_DEPLOYED ? System.getenv("EXAM_SECRET_KEY") : Utils.getPropertyValue("SECRET_KEY", "config.properties");
 
         try {
             if (tokenSecurity.tokenIsValid(token, SECRET) && tokenSecurity.tokenNotExpired(token)) {
