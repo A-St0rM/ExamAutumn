@@ -40,7 +40,7 @@ public class Trip {
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "guide_id")
+    @JoinColumn(name = "guide_id", nullable = true)
     private Guide guide;
 
     @PrePersist @PreUpdate
