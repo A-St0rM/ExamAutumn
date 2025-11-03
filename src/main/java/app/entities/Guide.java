@@ -20,12 +20,16 @@ public class Guide {
     @Column(name = "guide_id", nullable = false, unique = true)
     private Integer id;
 
+    @Column(nullable = false, length = 80)
     private String name;
 
+    @Column(nullable = false, length = 120)
     private String email;
 
+    @Column(nullable = false, length = 24)
     private String phone;
 
+    @Column(nullable = false)
     private int yearsOfExperience;
 
 

@@ -20,21 +20,34 @@ public class Trip {
     @Column(name = "trip_id", nullable = false, unique = true)
     private Integer id;
 
+    @Column(nullable = false, length = 120)
     private String name;
 
+    @Column(nullable = false)
     private LocalDate startDate;
 
+    @Column(nullable = false)
     private LocalDate endDate;
 
+    @Column(nullable = false)
     private String locationCoordinates;
 
+    @Column(nullable = false)
     private double price;
 
-    @Enumerated(EnumType.STRING) @Column(nullable=false)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "guide_id", nullable = false)
     private Guide guide;
+
+    @PrePersist @PreUpdate
+    private void validateDates() {
+        if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
+            throw new IllegalArgumentException("endDate must be >= startDate");
+        }
+    }
 
 }
