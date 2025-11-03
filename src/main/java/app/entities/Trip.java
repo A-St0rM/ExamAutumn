@@ -33,7 +33,7 @@ public class Trip {
     @Enumerated(EnumType.STRING) @Column(nullable=false)
     private Category category;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "guide_id", nullable = false)
     private Guide guide;
 
