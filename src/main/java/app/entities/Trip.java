@@ -39,7 +39,7 @@ public class Trip {
     @Column(nullable = false, length = 30)
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "guide_id", nullable = true)
     private Guide guide;
 
