@@ -22,6 +22,7 @@ public class CandidateRoute {
             post("/", candidateController::create);
             put("/{id}", candidateController::update);
             delete("/{id}", candidateController::delete);
+            get("/top-by-popularity", candidateController::getTopByPopularity);
 
             put("/{candidateId}/skills/{skillId}", candidateController::linkSkillToCandidate);
         };

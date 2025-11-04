@@ -33,6 +33,17 @@ public class CandidateController {
         }
     }
 
+    //top-by-popularity
+    public void getTopByPopularity(Context ctx) {
+        var result = candidateService.getTopCandidateByPopularity();
+
+        if (result.containsKey("message")) {
+            ctx.status(HttpStatus.NOT_FOUND).json(result);
+        } else {
+            ctx.status(HttpStatus.OK).json(result);
+        }
+    }
+
     // GET /candidates
     public void getAll(Context ctx) {
         var candidates = candidateService.getAllCandidates();
