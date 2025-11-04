@@ -2,15 +2,12 @@ package app.api;
 
 import app.config.ApplicationConfig;
 import app.config.HibernateConfig;
-import app.exceptions.DatabaseException;
 import app.populator.CandidatePopulator;
 import app.services.ApiService;
 import app.DTO.SkillStatsDTO;
 import io.restassured.RestAssured;
 import io.javalin.Javalin;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.*;
 
 import java.util.List;

@@ -25,8 +25,7 @@ public class Candidate {
 
     private String educationBackground;
 
-    //TODO: nødvendig med cascade metode ift DAO?
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "candidate_skill",
             joinColumns = @JoinColumn(name = "candidate_id"),

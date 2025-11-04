@@ -25,6 +25,6 @@ GET http://localhost:7007/api/v1/protected/user_demo
 GET http://localhost:7007/api/v1/protected/user_demo
 Authorization: Bearer {{token}}
 
-### Access admin route with user token (should fail 403)
+### Access admin route with user token (should fail)
 GET http://localhost:7007/api/v1/protected/admin_demo
 Authorization: Bearer {{token}}
