@@ -149,3 +149,56 @@ Projektet indeholder **integrationstests** med **JUnit 5** og **RestAssured**. F
 ```bash
 mvn clean test
 ```
+
+## 🚀 Kørsel Lokalt
+
+For at køre projektet lokalt på din maskine, skal du følge disse trin:
+
+### 🔧 Forudsætninger
+- Java 17 eller nyere
+- Maven installeret
+- PostgreSQL kørende lokalt eller via Docker
+- `config.properties` fil placeret i `src/main/resources` og `src/test/resources`
+
+### ⚙️ Opsætning af `config.properties`
+Opret en fil `config.properties` i både `src/main/resources` og `src/test/resources` med følgende indhold:
+
+```properties
+DEPLOYED=true
+DB_NAME= <dbname> 
+DB_USERNAME=postgres
+DB_PASSWORD= <password>
+CONNECTION_STR= jdbc:postgresql://db:5432/
+SECRET_KEY= <secret key>
+ISSUER= A-St0rM
+TOKEN_EXPIRE_TIME=18000
+```
+### ️ Opret lokal database
+
+Start PostgreSQL.
+
+Opret en database med navnet fra DB_NAME:
+
+```SQL
+CREATE DATABASE examautumn;
+```
+🏗️ Byg og start projektet
+
+Clone repository:
+```linux
+git clone <din-repo-url>
+cd <repo-mappen>
+```
+
+Byg projektet med Maven:
+```Maven
+mvn clean install
+```
+
+#### Start serveren:
+
+### Bekræft at serveren kører:
+
+```text
+http://localhost:7007/api/v1/auth/healthcheck
+```
