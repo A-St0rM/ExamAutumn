@@ -7,6 +7,8 @@ Candidate Matcher Application
 **Purpose:**  
 Et backend-system til en rekrutteringsplatform, der hjælper med at matche kandidater med relevante færdigheder og teknologier. Brugere kan oprette, læse, opdatere og slette kandidater og skills, filtrere kandidater efter skill-kategori, og se markedets indsigt i skill-popularitet og lønniveauer.
 
+**Status:** Projektet dækker alle user stories og er fuldt funktionelt.
+
 **Technologies Used:**  
 Java, Javalin, JPA/Hibernate, PostgreSQL, Maven, JWT, RestAssured, Docker
 
