@@ -25,6 +25,7 @@ public class Candidate {
 
     private String educationBackground;
 
+    //TODO: nødvendig med cascade metode ift DAO?
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "candidate_skill",

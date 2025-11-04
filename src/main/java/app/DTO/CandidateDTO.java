@@ -4,14 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
+import java.util.Set;
+
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
-public class GuideDTO {
+public class CandidateDTO {
     private Integer id;
     private String name;
-    private String email;
     private String phone;
-    private int yearsOfExperience;
-}
+    private String educationBackground;
+    private Set<SkillDTO> skills;
 
+}
