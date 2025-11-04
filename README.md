@@ -66,7 +66,7 @@ https://examautumn.showmecode.dk/api/v1/auth/healthcheck
 ---
 ### Example JSON Responses
 
-**GET /candidates/{id}**
+**GET /candidate/{id}**
 ```json
 {
   "id": 1,
@@ -86,7 +86,7 @@ https://examautumn.showmecode.dk/api/v1/auth/healthcheck
   ]
 }
 ```
-**POST /candidates**
+**POST /candidate**
 ```json
 {
 "name": "Charlie",
