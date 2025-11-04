@@ -25,10 +25,14 @@ public class CandidateService {
     }
 
     public List<CandidateDTO> getCandidatesByCategory(String category) {
-        List<Candidate> candidates = candidateDAO.getCandidatesByCategory(category);
+
+        List<Candidate> candidates = candidateDAO.getAll();
+
         return candidates.stream()
+                .filter(candidate -> candidate.getSkills().stream()
+                        .anyMatch(skill -> skill.getCategory().equals(category)))
                 .map(DTOMapper::toCandidateDTO)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     public List<CandidateDTO> getAllCandidates() {
@@ -72,59 +76,6 @@ public class CandidateService {
         return candidateDTO;
     }
 
-    public Map<String, Object> getTopCandidateByPopularity() {
-        List<Candidate> candidates = candidateDAO.getAll();
-
-        if (candidates.isEmpty()) {
-            return Map.of("message", "No candidates found");
-        }
-
-        // Map til DTO'er for at bruge enrichments
-        List<CandidateDTO> candidateDTOs = candidates.stream()
-                .map(DTOMapper::toCandidateDTO)
-                .toList();
-
-        double highestAvg = 0.0;
-        Integer topCandidateId = null;
-
-        for (CandidateDTO candidateDTO : candidateDTOs) {
-            if (candidateDTO.getSkills() == null || candidateDTO.getSkills().isEmpty()) {
-                continue;
-            }
-
-
-            List<String> slugs = candidateDTO.getSkills().stream()
-                    .map(SkillDTO::getSlug)
-                    .filter(Objects::nonNull)
-                    .toList();
-
-            if (slugs.isEmpty()) continue;
-
-            List<SkillStatsDTO> skillStats = apiService.fetchSkillStats(slugs);
-
-            // Beregn gennemsnitlig popularity
-            double avgPopularity = skillStats.stream()
-                    .mapToInt(SkillStatsDTO::getPopularityScore)
-                    .average()
-                    .orElse(0.0);
-
-            if (avgPopularity > highestAvg) {
-                highestAvg = avgPopularity;
-                topCandidateId = candidateDTO.getId();
-            }
-        }
-
-        if (topCandidateId == null) {
-            return Map.of("message", "No candidates with skill popularity data");
-        }
-
-        return Map.of(
-                "candidateId", topCandidateId,
-                "averagePopularityScore", highestAvg
-        );
-    }
-
-
     public CandidateDTO createCandidate(CandidateDTO candidateDTO) {
         Candidate candidate = DTOMapper.toCandidateEntity(candidateDTO);
         candidate = candidateDAO.create(candidate);
@@ -156,5 +107,67 @@ public class CandidateService {
 
         return true;
     }
+
+    public Map<String, Object> getTopCandidateByPopularity() {
+        try {
+            List<Candidate> candidates = candidateDAO.getAll();
+
+            // Hvis ingen kandidater findes, returner et besked
+            if (candidates.isEmpty()) {
+                return Map.of("message", "No candidates found");
+            }
+
+            // Mapper kandidater til DTO'er for videre behandling
+            List<CandidateDTO> candidateDTOs = candidates.stream()
+                    .map(DTOMapper::toCandidateDTO)
+                    .collect(Collectors.toList());
+
+            double highestAvg = 0.0;
+            Integer topCandidateId = null;
+
+            // Beregning af gennemsnitlig popularitet for hver kandidat
+            for (CandidateDTO candidateDTO : candidateDTOs) {
+                if (candidateDTO.getSkills() == null || candidateDTO.getSkills().isEmpty()) {
+                    continue;
+                }
+
+                // Få slug for skills og hent statistikker for dem
+                List<String> slugs = candidateDTO.getSkills().stream()
+                        .map(SkillDTO::getSlug)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+
+                if (slugs.isEmpty()) continue;
+
+                // Hent skill stats og beregn gennemsnitlig popularitet
+                List<SkillStatsDTO> skillStats = apiService.fetchSkillStats(slugs);
+                double avgPopularity = skillStats.stream()
+                        .mapToInt(SkillStatsDTO::getPopularityScore)
+                        .average()
+                        .orElse(0.0);
+
+                // Opdater den kandidat med den højeste gennemsnitlige popularitet
+                if (avgPopularity > highestAvg) {
+                    highestAvg = avgPopularity;
+                    topCandidateId = candidateDTO.getId();
+                }
+            }
+
+            // Hvis ingen kandidat har en beregnet popularitet
+            if (topCandidateId == null) {
+                return Map.of("message", "No candidates with skill popularity data");
+            }
+
+            // Returnér ID for topkandidaten og gennemsnitlig popularitet
+            return Map.of(
+                    "candidateId", topCandidateId,
+                    "averagePopularityScore", highestAvg
+            );
+        } catch (Exception e) {
+            // Håndter eventuelle fejl
+            return Map.of("message", "Internal error occurred: " + e.getMessage());
+        }
+    }
+
 }
 

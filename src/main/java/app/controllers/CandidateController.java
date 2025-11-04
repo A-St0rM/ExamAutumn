@@ -15,6 +15,16 @@ public class CandidateController {
         this.candidateService = candidateService;
     }
 
+    public void getTopByPopularity(Context ctx) {
+        var result = candidateService.getTopCandidateByPopularity();
+
+        if (result.containsKey("message")) {
+            ctx.status(HttpStatus.NOT_FOUND).json(result);
+        } else {
+            ctx.status(HttpStatus.OK).json(result);
+        }
+    }
+
     public void getByCategory(Context ctx) {
         String category = ctx.queryParam("category");
 
@@ -30,17 +40,6 @@ public class CandidateController {
             ctx.status(HttpStatus.NOT_FOUND).result("No candidates found with skill category " + category);
         } else {
             ctx.status(HttpStatus.OK).json(candidates);
-        }
-    }
-
-    //top-by-popularity
-    public void getTopByPopularity(Context ctx) {
-        var result = candidateService.getTopCandidateByPopularity();
-
-        if (result.containsKey("message")) {
-            ctx.status(HttpStatus.NOT_FOUND).json(result);
-        } else {
-            ctx.status(HttpStatus.OK).json(result);
         }
     }
 

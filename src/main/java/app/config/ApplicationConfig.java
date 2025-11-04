@@ -2,19 +2,15 @@ package app.config;
 
 import app.DAO.CandidateDAO;
 import app.DAO.SkillDAO;
-import app.Main;
 import app.controllers.CandidateController;
-import app.controllers.TripController;
 import app.routes.CandidateRoute;
 import app.routes.Route;
-import app.routes.TripRoute;
 import app.security.SecurityController;
+import app.services.ApiService;
 import app.services.CandidateService;
 import io.javalin.Javalin;
 import io.javalin.config.JavalinConfig;
 import io.javalin.http.HttpStatus;
-import io.javalin.http.InternalServerErrorResponse;
-import jakarta.persistence.EntityManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +31,7 @@ public class ApplicationConfig {
         config.router.apiBuilder(routes.getRoutes());
     }
 
-    public static ApplicationConfig startServer(int port) {
+    public static Javalin startServer(int port) {
         routes = new Route();
 
         //DI (Best practice)
@@ -46,8 +42,7 @@ public class ApplicationConfig {
         CandidateRoute candidateRoute = new CandidateRoute(candidateController);
         routes.setCandidateRoute(candidateRoute);
 
-
-        var app = Javalin.create(ApplicationConfig::configuration);
+        Javalin app = Javalin.create(ApplicationConfig::configuration);
 
         logger.info("Java application started!");
 
@@ -103,37 +98,35 @@ public class ApplicationConfig {
         app.beforeMatched(securityController.authorize());
 
         app.start(port);
-        return appConfig;
+        return app;
     }
 
 
-    //Overloaded method for test
-    public static ApplicationConfig startServer(int port, app.Integrations.PackingApiClient packingClient) {
-        routes = new app.routes.Route();
 
-//
-//        var emf = HibernateConfig.getEntityManagerFactory();
-//        var tripController = new app.controllers.TripController(emf, packingClient);
-//        var tripRoute = new app.routes.TripRoute(tripController);
-//        routes.setTripRoute(tripRoute);
+    /** Test / mock-overload */
+    public static Javalin startServer(int port, ApiService apiService) {
+        routes = new Route();
 
-        var app = Javalin.create(ApplicationConfig::configuration);
+        // Hvis ingen ApiService leveres, opret default
+        if (apiService == null) {
+            apiService = new ApiService();
+        }
 
-        logger.info("Java application started!");
+        CandidateService candidateService = new CandidateService(
+                new CandidateDAO(HibernateConfig.getEntityManagerFactory()),
+                new SkillDAO(HibernateConfig.getEntityManagerFactory()),
+                apiService
+        );
 
-        app.get("/", ctx -> {
-            logger.info("Handling request to /");
-            ctx.result("Hello, Javalin with Logging!");
-        });
+        CandidateController candidateController = new CandidateController(candidateService);
+        CandidateRoute candidateRoute = new CandidateRoute(candidateController);
+        routes.setCandidateRoute(candidateRoute);
 
-        app.get("/error", ctx -> {
-            logger.error("An error endpoint was accessed");
-            throw new RuntimeException("This is an intentional error for logging demonstration.");
-        });
+        Javalin app = Javalin.create(ApplicationConfig::configuration);
 
-        app.before(ctx -> {
-            logger.info("Received {} request to {}", ctx.method(), ctx.path());
-        });
+        logger.info("Javalin server started on port {}", port);
+
+        app.get("/", ctx -> ctx.result("Hello, Javalin Test!"));
 
         // Global exception mapping
         app.exception(app.exceptions.EntityNotFoundException.class, (e, ctx) -> {
@@ -149,6 +142,13 @@ public class ApplicationConfig {
             ctx.status(500).json(Map.of("error","DATABASE_ERROR","message",e.getMessage()));
         });
 
+        app.exception(io.javalin.http.UnauthorizedResponse.class, (e, ctx) -> {
+            ctx.status(401).json(Map.of("error","UNAUTHORIZED","message", e.getMessage()));
+        });
+        app.exception(io.javalin.http.ForbiddenResponse.class, (e, ctx) -> {
+            ctx.status(403).json(Map.of("error","FORBIDDEN","message", e.getMessage()));
+        });
+
         // Catch-all exception handler
         app.exception(Exception.class, (e, ctx) -> {
             logger.error("Unhandled exception at {} {}", ctx.method(), ctx.path(), e);
@@ -161,13 +161,14 @@ public class ApplicationConfig {
             ctx.json(Map.of("error", "INTERNAL_SERVER_ERROR", "message", "Off limits!"));
         });
 
+
+        // Security hooks kan med fordel stadig medtages
         app.beforeMatched(securityController.authenticate());
         app.beforeMatched(securityController.authorize());
 
         app.start(port);
-        return appConfig;
+        return app;
     }
-
 
 
     public static void stopServer(Javalin app) {

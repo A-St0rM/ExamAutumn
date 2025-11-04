@@ -18,13 +18,12 @@ public class CandidateRoute {
         return () -> {
             get("/", candidateController::getAll);
             get("/{id}", candidateController::getById);
-            get("/", candidateController::getByCategory);
+            get("/category", candidateController::getByCategory);
             post("/", candidateController::create);
             put("/{id}", candidateController::update);
             delete("/{id}", candidateController::delete);
-            get("/top-by-popularity", candidateController::getTopByPopularity);
-
             put("/{candidateId}/skills/{skillId}", candidateController::linkSkillToCandidate);
+            get("/reports/candidates/top-by-popularity", candidateController::getTopByPopularity);
         };
     }
 }

@@ -1,6 +1,5 @@
 package app.DAO;
 
-import app.entities.Guide;
 
 import java.util.List;
 

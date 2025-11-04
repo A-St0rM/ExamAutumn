@@ -76,22 +76,18 @@ public class CandidateDAO implements IDAO<Candidate, Integer> {
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            em.persist(candidate);
+            // Brug merge i stedet for persist
+            candidate = em.merge(candidate);
             tx.commit();
             return candidate;
-        } catch (EntityExistsException e) {
-            safeRollback(tx);
-            throw new DatabaseException("Candidate already exists");
-        } catch (RollbackException e) {
-            safeRollback(tx);
-            throw new DatabaseException("Could not create candidate (constraint violation?)");
         } catch (PersistenceException e) {
             safeRollback(tx);
-            throw new DatabaseException("Failed to create candidate");
+            throw new DatabaseException("Failed to create or update candidate");
         } finally {
             em.close();
         }
     }
+
 
     @Override
     public Candidate update(Candidate candidate) {
