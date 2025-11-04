@@ -32,6 +32,7 @@ public class TripController {
 
     // GET /trips
     public void getAll(Context ctx) {
+
         String categoryParam = ctx.queryParam("category");
         List<Trip> entities;
 
