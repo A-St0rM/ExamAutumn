@@ -10,12 +10,27 @@ import jakarta.persistence.*;
 import java.util.List;
 import java.util.Set;
 
-public class CandidateDAO implements IDAO<Candidate, Integer> {  // Changed Long to Integer
+public class CandidateDAO implements IDAO<Candidate, Integer> {
 
     private final EntityManagerFactory emf;
 
     public CandidateDAO(EntityManagerFactory emf) {
         this.emf = emf;
+    }
+
+    public List<Candidate> getCandidatesByCategory(String category) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            String jpql = "SELECT c FROM Candidate c JOIN c.skills s WHERE s.category = :category";
+            TypedQuery<Candidate> query = em.createQuery(jpql, Candidate.class);
+            query.setParameter("category", category.toUpperCase());
+            return query.getResultList();
+        } catch (Exception e) {
+            throw new DatabaseException("Error fetching candidates by category");
+        }
+        finally {
+            em.close();
+        }
     }
 
     @Override
@@ -129,7 +144,7 @@ public class CandidateDAO implements IDAO<Candidate, Integer> {  // Changed Long
         }
     }
 
-    public void linkCandidateSkills(Integer candidateId, Set<Skill> skills) {  // Changed Long to Integer
+    public void linkCandidateSkills(Integer candidateId, Set<Skill> skills) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
@@ -151,6 +166,7 @@ public class CandidateDAO implements IDAO<Candidate, Integer> {  // Changed Long
             em.close();
         }
     }
+
 
     private void safeRollback(EntityTransaction tx) {
         if (tx != null && tx.isActive()) {

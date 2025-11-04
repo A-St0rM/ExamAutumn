@@ -5,12 +5,32 @@ import app.DTO.CandidateDTO;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 
+import java.util.List;
+
 public class CandidateController {
 
     private final CandidateService candidateService;
 
     public CandidateController(CandidateService candidateService) {
         this.candidateService = candidateService;
+    }
+
+    public void getByCategory(Context ctx) {
+        String category = ctx.queryParam("category");
+
+        if (category == null || category.isBlank()) {
+            ctx.status(HttpStatus.BAD_REQUEST).result("Category parameter is required");
+            return;
+        }
+
+        // Hent kandidater baseret på kategori
+        List<CandidateDTO> candidates = candidateService.getCandidatesByCategory(category);
+
+        if (candidates.isEmpty()) {
+            ctx.status(HttpStatus.NOT_FOUND).result("No candidates found with skill category " + category);
+        } else {
+            ctx.status(HttpStatus.OK).json(candidates);
+        }
     }
 
     // GET /candidates

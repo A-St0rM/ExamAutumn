@@ -21,6 +21,13 @@ public class CandidateService {
         this.skillDAO = skillDAO;
     }
 
+    public List<CandidateDTO> getCandidatesByCategory(String category) {
+        List<Candidate> candidates = candidateDAO.getCandidatesByCategory(category);
+        return candidates.stream()
+                .map(DTOMapper::toCandidateDTO)
+                .toList();
+    }
+
     public List<CandidateDTO> getAllCandidates() {
         List<Candidate> candidates = candidateDAO.getAll();
         return candidates.stream()
