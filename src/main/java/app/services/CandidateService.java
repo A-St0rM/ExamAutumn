@@ -3,22 +3,25 @@ package app.services;
 import app.DAO.CandidateDAO;
 import app.DAO.SkillDAO;
 import app.DTO.CandidateDTO;
+import app.DTO.SkillDTO;
+import app.DTO.SkillStatsDTO;
 import app.entities.Candidate;
 import app.entities.Skill;
 import app.mapper.DTOMapper;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CandidateService {
 
     private final CandidateDAO candidateDAO;
     private final SkillDAO skillDAO;
+    private final ApiService apiService;
 
-    public CandidateService(CandidateDAO candidateDAO, SkillDAO skillDAO) {
+    public CandidateService(CandidateDAO candidateDAO, SkillDAO skillDAO, ApiService apiService) {
         this.candidateDAO = candidateDAO;
         this.skillDAO = skillDAO;
+        this.apiService = apiService;
     }
 
     public List<CandidateDTO> getCandidatesByCategory(String category) {
@@ -37,7 +40,36 @@ public class CandidateService {
 
     public CandidateDTO getCandidateById(Integer id) {
         Candidate candidate = candidateDAO.getById(id);
-        return DTOMapper.toCandidateDTO(candidate);
+        if (candidate == null) return null;
+
+        CandidateDTO candidateDTO = DTOMapper.toCandidateDTO(candidate);
+
+        if (candidateDTO.getSkills() == null || candidateDTO.getSkills().isEmpty()) {
+            candidateDTO.setSkills(Set.of());
+            return candidateDTO;
+        }
+
+        // 🔹 Brug DTO-slugs til API-kald
+        List<String> slugs = candidateDTO.getSkills().stream()
+                .map(SkillDTO::getSlug)
+                .filter(Objects::nonNull)
+                .toList();
+
+        List<SkillStatsDTO> skillStats = apiService.fetchSkillStats(slugs);
+
+        Map<String, SkillStatsDTO> statsMap = skillStats.stream()
+                .collect(Collectors.toMap(SkillStatsDTO::getSlug, s -> s));
+
+
+        candidateDTO.getSkills().forEach(skillDTO -> {
+            SkillStatsDTO stat = statsMap.get(skillDTO.getSlug());
+            if (stat != null) {
+                skillDTO.setPopularityScore(stat.getPopularityScore());
+                skillDTO.setAverageSalary(stat.getAverageSalary());
+            }
+        });
+
+        return candidateDTO;
     }
 
     public CandidateDTO createCandidate(CandidateDTO candidateDTO) {

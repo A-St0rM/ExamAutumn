@@ -11,6 +11,10 @@ import lombok.NoArgsConstructor;
 public class SkillDTO {
     private Integer id;
     private String name;
+    private String slug;
     private String description;
     private Category category;
+    private Integer popularityScore;
+    private Integer averageSalary;
+
 }

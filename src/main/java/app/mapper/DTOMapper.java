@@ -29,12 +29,20 @@ public class DTOMapper {
 
     // Convert Skill entity to SkillDTO
     public static SkillDTO toSkillDTO(Skill skill) {
-        return new SkillDTO(
-                skill.getId(),
-                skill.getName(),
-                skill.getDescription(),
-                skill.getCategory()
-        );
+        SkillDTO dto = new SkillDTO();
+        dto.setId(skill.getId());
+        dto.setName(skill.getName());
+        dto.setDescription(skill.getDescription());
+        dto.setCategory(skill.getCategory());
+
+        dto.setSlug(generateSlug(skill.getName()));
+
+        return dto;
+    }
+
+    private static String generateSlug(String name) {
+        if (name == null) return null;
+        return name.toLowerCase().replace(" ", "-");
     }
 
     // Convert CandidateDTO to Candidate entity

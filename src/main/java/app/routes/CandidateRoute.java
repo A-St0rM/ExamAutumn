@@ -13,6 +13,7 @@ public class CandidateRoute {
         this.candidateController = candidateController;
     }
 
+    //TODO: add security
     public EndpointGroup getRoutes() {
         return () -> {
             get("/", candidateController::getAll);

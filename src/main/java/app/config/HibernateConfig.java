@@ -1,10 +1,8 @@
 package app.config;
 
 import app.entities.Candidate;
-import app.entities.Guide;
 import app.entities.Role;
 import app.entities.Skill;
-import app.entities.Trip;
 import app.entities.User;
 import app.utils.Utils;
 

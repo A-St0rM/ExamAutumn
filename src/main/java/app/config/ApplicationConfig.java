@@ -39,14 +39,9 @@ public class ApplicationConfig {
         routes = new Route();
 
         //DI (Best practice)
-        var objectMapper = new app.utils.Utils().getObjectMapper();
         var apiService   = new app.services.ApiService();
-        var packingClient = new app.Integrations.PackingApiClient( apiService,
-                objectMapper,
-                "https://packingapi.cphbusinessapps.dk"
-        );
 
-        CandidateService candidateService = new CandidateService(new CandidateDAO(HibernateConfig.getEntityManagerFactory()), new SkillDAO(HibernateConfig.getEntityManagerFactory()));
+        CandidateService candidateService = new CandidateService(new CandidateDAO(HibernateConfig.getEntityManagerFactory()), new SkillDAO(HibernateConfig.getEntityManagerFactory()), apiService);
         CandidateController candidateController = new CandidateController(candidateService);
         CandidateRoute candidateRoute = new CandidateRoute(candidateController);
         routes.setCandidateRoute(candidateRoute);
