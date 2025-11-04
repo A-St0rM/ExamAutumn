@@ -1,10 +1,15 @@
 package app.config;
 
+import app.DAO.CandidateDAO;
+import app.DAO.SkillDAO;
 import app.Main;
+import app.controllers.CandidateController;
 import app.controllers.TripController;
+import app.routes.CandidateRoute;
 import app.routes.Route;
 import app.routes.TripRoute;
 import app.security.SecurityController;
+import app.services.CandidateService;
 import io.javalin.Javalin;
 import io.javalin.config.JavalinConfig;
 import io.javalin.http.HttpStatus;
@@ -34,7 +39,6 @@ public class ApplicationConfig {
         routes = new Route();
 
         //DI (Best practice)
-        EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
         var objectMapper = new app.utils.Utils().getObjectMapper();
         var apiService   = new app.services.ApiService();
         var packingClient = new app.Integrations.PackingApiClient( apiService,
@@ -42,10 +46,11 @@ public class ApplicationConfig {
                 "https://packingapi.cphbusinessapps.dk"
         );
 
-        TripController tripController = new TripController(emf, packingClient);
-        TripRoute tripRoute = new TripRoute(tripController);
+        CandidateService candidateService = new CandidateService(new CandidateDAO(HibernateConfig.getEntityManagerFactory()), new SkillDAO(HibernateConfig.getEntityManagerFactory()));
+        CandidateController candidateController = new CandidateController(candidateService);
+        CandidateRoute candidateRoute = new CandidateRoute(candidateController);
+        routes.setCandidateRoute(candidateRoute);
 
-        routes.setTripRoute(tripRoute);
 
         var app = Javalin.create(ApplicationConfig::configuration);
 
@@ -111,11 +116,11 @@ public class ApplicationConfig {
     public static ApplicationConfig startServer(int port, app.Integrations.PackingApiClient packingClient) {
         routes = new app.routes.Route();
 
-
-        var emf = HibernateConfig.getEntityManagerFactory();
-        var tripController = new app.controllers.TripController(emf, packingClient);
-        var tripRoute = new app.routes.TripRoute(tripController);
-        routes.setTripRoute(tripRoute);
+//
+//        var emf = HibernateConfig.getEntityManagerFactory();
+//        var tripController = new app.controllers.TripController(emf, packingClient);
+//        var tripRoute = new app.routes.TripRoute(tripController);
+//        routes.setTripRoute(tripRoute);
 
         var app = Javalin.create(ApplicationConfig::configuration);
 

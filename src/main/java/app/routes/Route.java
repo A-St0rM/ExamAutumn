@@ -1,5 +1,6 @@
 package app.routes;
 
+import app.entities.Candidate;
 import app.security.SecurityRoute;
 import app.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,16 +15,16 @@ public class Route {
 
     private SecurityRoute securityRoute = new SecurityRoute();
     @Setter
-    private TripRoute  tripRoute;
+    private CandidateRoute candidateRoute;
     private static ObjectMapper jsonMapper = new Utils().getObjectMapper();
 
 
 
     public EndpointGroup getRoutes() {
         return () -> {
-            path("/trip",  tripRoute.getRoutes());
             path("/auth", securityRoute.getSecurityRoutes());
             path("/protected", getSecuredRoutes());
+            path("/candidate", candidateRoute.getRoutes());
         };
     }
 
