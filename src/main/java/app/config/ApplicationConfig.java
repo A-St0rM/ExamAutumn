@@ -10,6 +10,7 @@ import app.services.ApiService;
 import app.services.CandidateService;
 import io.javalin.Javalin;
 import io.javalin.config.JavalinConfig;
+import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,12 +75,14 @@ public class ApplicationConfig {
             ctx.status(500).json(Map.of("error","DATABASE_ERROR","message",e.getMessage()));
         });
 
-        app.exception(io.javalin.http.UnauthorizedResponse.class, (e, ctx) -> {
-            ctx.status(401).json(Map.of("error","UNAUTHORIZED","message", e.getMessage()));
-        });
         app.exception(io.javalin.http.ForbiddenResponse.class, (e, ctx) -> {
             ctx.status(403).json(Map.of("error","FORBIDDEN","message", e.getMessage()));
         });
+
+        app.exception(io.javalin.http.UnauthorizedResponse.class, (e, ctx) -> {
+            ctx.status(401).json(Map.of("error","UNAUTHORIZED","message", e.getMessage()));
+        });
+
 
         // Catch-all exception handler
         app.exception(Exception.class, (e, ctx) -> {
@@ -93,12 +96,28 @@ public class ApplicationConfig {
             ctx.json(Map.of("error", "INTERNAL_SERVER_ERROR", "message", "Off limits!"));
         });
 
-
+        app.before(ApplicationConfig::corsHeaders);
+        app.options("/*", ApplicationConfig::corsHeadersOptions);
         app.beforeMatched(securityController.authenticate());
         app.beforeMatched(securityController.authorize());
 
         app.start(port);
         return app;
+    }
+
+    private static void corsHeaders(Context ctx) {
+        ctx.header("Access-Control-Allow-Origin", "*");
+        ctx.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        ctx.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        ctx.header("Access-Control-Allow-Credentials", "true");
+    }
+
+    private static void corsHeadersOptions(Context ctx) {
+        ctx.header("Access-Control-Allow-Origin", "*");
+        ctx.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        ctx.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        ctx.header("Access-Control-Allow-Credentials", "true");
+        ctx.status(204);
     }
 
 

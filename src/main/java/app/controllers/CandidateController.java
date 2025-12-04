@@ -43,7 +43,7 @@ public class CandidateController {
         }
     }
 
-    // GET /candidates
+
     public void getAll(Context ctx) {
         var candidates = candidateService.getAllCandidates();
         ctx.status(HttpStatus.OK).json(candidates);
@@ -60,7 +60,7 @@ public class CandidateController {
         }
     }
 
-    // POST /candidates
+
     public void create(Context ctx) {
         CandidateDTO candidateDTO = ctx.bodyValidator(CandidateDTO.class)
                 .check(dto -> dto.getName() != null && !dto.getName().isBlank(), "Name is required")
@@ -99,6 +99,7 @@ public class CandidateController {
     public void linkSkillToCandidate(Context ctx) {
         Integer candidateId = Integer.valueOf(ctx.pathParam("candidateId"));
         Integer skillId = Integer.valueOf(ctx.pathParam("skillId"));
+
         boolean linked = candidateService.linkSkillToCandidate(candidateId, skillId);
         if (linked) {
             ctx.status(HttpStatus.NO_CONTENT);

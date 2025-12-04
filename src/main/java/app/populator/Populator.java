@@ -41,7 +41,7 @@ public class Populator {
 
             em.getTransaction().commit();
 
-            System.out.println("✅ Sample data inserted.");
+            System.out.println("Sample data inserted.");
         } catch (Exception e) {
             e.printStackTrace();
         }

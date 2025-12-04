@@ -25,6 +25,7 @@ public class Candidate {
 
     private String educationBackground;
 
+    //p, m-> .add(skill)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "candidate_skill",
