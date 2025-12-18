@@ -74,7 +74,7 @@ class CandidateApiTest {
     @Test
     void getAllCandidates_returnsAll() {
         given()
-                .when().get("/candidate")
+                .when().get("/candidates")
                 .then()
                 .statusCode(200)
                 .body("name", hasItems("Alice", "Bob"));
@@ -83,7 +83,7 @@ class CandidateApiTest {
     @Test
     void getCandidateById_includesEnrichment() {
         given()
-                .when().get("/candidate/" + candidateId1)
+                .when().get("/candidates/" + candidateId1)
                 .then()
                 .statusCode(200)
                 .body("id", equalTo(candidateId1))
@@ -95,7 +95,7 @@ class CandidateApiTest {
     @Test
     void getCandidatesByCategory_filtersCorrectly() {
         given()
-                .when().get("/candidate?category=PROG_LANG")
+                .when().get("/candidates?category=PROG_LANG")
                 .then()
                 .statusCode(200)
                 .body("findAll { it.skills.any { it.category == 'PROG_LANG' } }", not(empty()));
@@ -104,7 +104,7 @@ class CandidateApiTest {
     @Test
     void getTopCandidateByPopularity() {
         given()
-                .when().get("candidate/reports/candidates/top-by-popularity")
+                .when().get("candidates/reports/candidates/top-by-popularity")
                 .then()
                 .statusCode(200)
                 .body("candidateId", notNullValue())
@@ -126,7 +126,7 @@ class CandidateApiTest {
                         .header("Authorization", "Bearer " + token)
                         .contentType("application/json")
                         .body(createJson)
-                        .when().post("/candidate")
+                        .when().post("/candidates")
                         .then()
                         .statusCode(201)
                         .body("name", equalTo("Charlie"))
@@ -145,7 +145,7 @@ class CandidateApiTest {
                 .header("Authorization", "Bearer " + token)
                 .contentType("application/json")
                 .body(updateJson)
-                .when().put("/candidate/" + newId)
+                .when().put("/candidates/" + newId)
                 .then()
                 .statusCode(200)
                 .body("name", equalTo("Charlie Updated"))
@@ -153,7 +153,7 @@ class CandidateApiTest {
 
         given()
                 .header("Authorization", "Bearer " + token)
-                .when().delete("/candidate/" + newId)
+                .when().delete("/candidates/" + newId)
                 .then()
                 .statusCode(204);
     }
@@ -165,13 +165,13 @@ class CandidateApiTest {
 
         given()
                 .header("Authorization", "Bearer " + token)
-                .when().put("/candidate/" + candidateId1 + "/skills/" + skillId)
+                .when().put("/candidates/" + candidateId1 + "/skills/" + skillId)
                 .then()
                 .statusCode(204);
 
 
         given()
-                .when().get("/candidate/" + candidateId1)
+                .when().get("/candidates/" + candidateId1)
                 .then()
                 .statusCode(200)
                 .body("skills.id", hasItem(skillId));
@@ -182,7 +182,7 @@ class CandidateApiTest {
         int invalidId = 9999;
 
         given()
-                .when().get("/candidate/" + invalidId)
+                .when().get("/candidates/" + invalidId)
                 .then()
                 .statusCode(404)
                 .body("error", equalTo("ENTITY_NOT_FOUND"))

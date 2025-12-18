@@ -24,7 +24,7 @@ public class Route {
         return () -> {
             path("/auth", securityRoute.getSecurityRoutes());
             path("/protected", getSecuredRoutes());
-            path("/candidate", candidateRoute.getRoutes());
+            path("/candidates", candidateRoute.getRoutes());
         };
     }
 
