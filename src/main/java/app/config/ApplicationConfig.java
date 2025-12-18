@@ -110,9 +110,7 @@ public class ApplicationConfig {
 
         if (origin != null && (
                 origin.equals("http://localhost:5173") ||
-                        origin.equals("https://skillmatch.showmecode.dk/") ||
-                        origin.equals("http://examautumn.showmecode.dk") ||
-                        origin.equals("https://examautumn.showmecode.dk")
+                        origin.equals("https://skillmatch.showmecode.dk")
         )) {
             ctx.header("Access-Control-Allow-Origin", origin);
             ctx.header("Vary", "Origin");
@@ -127,6 +125,7 @@ public class ApplicationConfig {
         corsHeaders(ctx);
         ctx.status(204);
     }
+
 
 
 
